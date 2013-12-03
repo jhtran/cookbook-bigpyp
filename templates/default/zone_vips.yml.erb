@@ -1,0 +1,37 @@
+---
+load_balancing:
+<% @vips.each do |vip| %>
+  <%= vip['id'] %>:
+    <% if vip['dns'] %>
+    <%= "dns: #{ vip['dns'] }" %>
+    <% end %>
+    <% if vip['ssl'] %>
+    <%= "ssl: True" %>
+    <% end %>
+    ip: <%= vip['ip'] %>
+    front_port: <%= vip['front_port'] %>
+    back_port: <%= vip['back_port'] %>
+    monitor: <%= vip['monitor'] %>
+    members:
+    - <%= vip['members'].join("\n    - ") %>
+<% end %>
+
+rules:
+  offload.ssl:
+    name: /Common/https-offloaded-header
+    rule: >
+      when HTTP_REQUEST {
+        HTTP::header remove "X-Forwarded-Protocol";
+        HTTP::header insert "X-Forwarded-Protocol" "https";
+      }
+
+  nagios.failover:
+    name: /Common/monitoring-nagios-active-passive-pools
+    rule: >
+      when CLIENT_ACCEPTED {
+        if { [active_members monitoring.<%= node['zone'] %>.attcompute.com_80_pl] >= 1 } {
+          pool monitoring.<%= node['zone'] %>.attcompute.com_80_pl
+        } else {
+          pool monitoring.nagios.passive_80_pl
+        }
+      }

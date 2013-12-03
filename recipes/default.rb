@@ -33,9 +33,10 @@ python_pip install_dir
 # generate the config file based on zone
 
 vips = search('vips', "*:*")
+vips.sort_by! {|vip| vip['id']}
 
-#template "#{install_dir}/conf/#{zone}_vips.yml"
-template "/tmp/#{node['zone']}_vips.yml" do
+zone_file = File.join(install_dir, "conf", "#{node['zone']}_vips.yml")
+template zone_file do
   source "zone_vips.yml.erb"
   mode 0755
   variables(:vips => vips)

@@ -2,8 +2,8 @@
 load_balancing:
 <% @vips.each do |vip| %>
   <%= vip['id'] %>:
-  <% vip.keys.each do |vipattr| %>
-    <% next if ['id', 'members'].include?(vipattr) %>
+  <% vip.keys.sort{|a,b| vip_attr_order(a) <=> vip_attr_order(b)}.each do |vipattr| %>
+    <% next if %W(id members).include?(vipattr.to_s) %>
     <%= "#{vipattr}: #{vip[vipattr]}" %>
   <% end %>
     members:

@@ -2,16 +2,10 @@
 load_balancing:
 <% @vips.each do |vip| %>
   <%= vip['id'] %>:
-    <% if vip['dns'] %>
-    <%= "dns: #{ vip['dns'] }" %>
-    <% end %>
-    <% if vip['ssl'] %>
-    <%= "ssl: True" %>
-    <% end %>
-    ip: <%= vip['ip'] %>
-    front_port: <%= vip['front_port'] %>
-    back_port: <%= vip['back_port'] %>
-    monitor: <%= vip['monitor'] %>
+  <% vip.keys.each do |vipattr| %>
+    <% next if ['id', 'members'].include?(vipattr) %>
+    <%= "#{vipattr}: #{vip[vipattr]}" %>
+  <% end %>
     members:
     - <%= vip['members'].join("\n    - ") %>
 <% end %>

@@ -29,7 +29,9 @@ git install_dir do
   action :sync
 end
 
-python_pip install_dir
+python_pip install_dir do
+  action :install
+end
 
 # generate the config file based on zone
 
